@@ -1,7 +1,7 @@
 # Replication and Fault Tolerance with Apache Cassandra
 
 This demo provides a step-by-step guide and console commands to show how
-Apache Cassandra handles data replication and ensures fault tolerance in a distributed environment.
+[Apache Cassandra](https://cassandra.apache.org/_/cassandra-basics.html) handles data replication and ensures fault tolerance in a distributed environment.
 
 
 ## Demo
