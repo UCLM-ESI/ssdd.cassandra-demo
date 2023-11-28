@@ -1,85 +1,81 @@
-# Replicación y Tolerancia a Fallos con Apache Cassandra
+# Replication and Fault Tolerance with Apache Cassandra
 
-Esta demostración proporciona una guía paso a paso y comandos de consola para mostrar cómo
-Apache Cassandra maneja la replicación de datos y garantiza la tolerancia a fallos en un
-entorno distribuido.
+This demo provides a step-by-step guide and console commands to show how
+Apache Cassandra handles data replication and ensures fault tolerance in a distributed environment.
+
 
 ## Demo
 
-### Creación de un KeySpace y una Tabla
+### Creating a KeySpace and a Table
 
-Inicia `cqlsh`, la consola de Cassandra:
+Start `cqlsh`, the Cassandra console:
 
 ```bash
 CREATE KEYSPACE demo_keyspace WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 3};
 ```
 
-Este comando crea un keyspace llamado "DemoKeyspace" con una estrategia de replicación
-simple y un factor de replicación de 3. Esto significa que los datos se replicarán en tres
-nodos.
+This command creates a keyspace named "DemoKeyspace" with a simple replication strategy and a replication factor of 3. This means that the data will be replicated to three nodes.
+nodes.
 
-### Crea una tabla en el keyspace
+### Creates a table in the keyspace
 
 ```bash
 USE demo_keyspace;
 CREATE TABLE demo_table (id UUID PRIMARY KEY, name TEXT, age INT);
 ```
 
-### Añade y consultar datos
+### Add and query data
 
 ```bash
 INSERT INTO demo_table (id, name, age) VALUES (uuid(), 'John Doe', 25);
 SELECT * FROM demo_table;
 ```
 
-### Verifica la replicación
+### Verify replication
 
 ```bash
 CONSISTENCY QUORUM;
 SELECT * FROM demo_table WHERE id = <id>;
 ```
 
-Al establecer la consistencia en QUORUM, estamos asegurando que al menos la mayoría de los
-nodos respondan antes de considerar la lectura o escritura como exitosa. Puedes ejecutar
-consultas SELECT para verificar que los datos se lean correctamente desde varios nodos.
+By setting consistency in QUORUM, we are ensuring that at least most of the nodes are responsive before we consider reading or writing nodes respond before considering the read or write as successful. You can run SELECT queries to verify that data is read correctly from multiple nodes.
 
 
-### Simulación de un fallo
+### Simulating a failure
 
-Detén un nodo de Cassandra mediante:
+Stop a Cassandra node by:
 
 ```bash
 $ docker compose stop <node>
 ```
 
 
-### Reactivación del nodo parado
+### Reactivation of the stopped node
 
 ```bash
 $ nodetool resumehandoff <node_id>
 ```
 
-Puedes monitorizar el proceso de sincronización utilizando `nodetool`:
+You can monitor the synchronization process using ``nodetool`:
 
 ```bash
 $ nodetool status
 ```
 
+## Consistency Levels
 
-## Niveles de consistencia
+Consistency levels control how data consistency is ensured across nodes in the cluster. There are various consistency levels available, and choosing a specific level affects the trade-off between consistency and availability. Here are the main consistency levels in Cassandra:
 
-Los niveles de consistencia controlan la forma en que se garantiza la coherencia de los datos entre los nodos del clúster. Hay varios niveles de consistencia disponibles, y la elección de un nivel específico afecta el equilibrio entre consistencia y disponibilidad. Aquí están los niveles de consistencia principales en Cassandra:
+ANY: This consistency level indicates that it is sufficient for the write or read to occur on at least one node. There is no guarantee that the data will be immediately replicated to other nodes.
 
-ANY: Este nivel de consistencia indica que se considera suficiente que la escritura o la lectura se realice en al menos un nodo. No hay garantía de que los datos se replicarán inmediatamente a otros nodos.
+ONE: The operation is considered successful if it is performed on at least one node responsible for the partition. This consistency level provides low latency and is suitable for situations where immediate consistency is not critical.
 
-ONE: La operación se considera exitosa si se realiza en al menos un nodo responsable de la partición. Este nivel de consistencia proporciona una baja latencia y es adecuado para situaciones en las que la consistencia inmediata no es crítica.
+TWO, THREE, QUORUM: These levels require the operation to be performed on a specific number of nodes owning the partition. In the case of QUORUM, a majority of nodes is required (number of nodes / 2 + 1). These levels offer a balance between consistency and availability.
 
-TWO, THREE, QUORUM: Estos niveles requieren que la operación se realice en un número específico de nodos que poseen la partición. En el caso de QUORUM, se requiere la mayoría de los nodos (número de nodos / 2 + 1). Estos niveles ofrecen un equilibrio entre consistencia y disponibilidad.
+ALL: The operation is considered successful only if it is performed on all nodes responsible for the partition. It provides the highest consistency but may result in higher latency and lower availability, as all nodes must be available to complete the operation.
 
-ALL: La operación se considera exitosa solo si se realiza en todos los nodos responsables de la partición. Proporciona la mayor consistencia, pero puede resultar en una mayor latencia y menor disponibilidad, ya que todos los nodos deben estar disponibles para completar la operación.
+LOCAL_ONE, LOCAL_QUORUM, EACH_QUORUM: These levels are used in clusters distributed across multiple datacenters. They allow specifying consistency levels for operations affecting local nodes or requiring the participation of nodes in different datacenters.
 
-LOCAL_ONE, LOCAL_QUORUM, EACH_QUORUM: Estos niveles se utilizan en clústeres distribuidos en múltiples centros de datos (datacenters). Permiten especificar niveles de consistencia para operaciones que afectan a nodos locales o requieren la participación de nodos en diferentes centros de datos.
+SERIAL and LOCAL_SERIAL: These levels are used in conjunction with lightweight transaction (LWT) read and write operations, providing a mechanism to ensure consistency across transaction-like operations.
 
-SERIAL y LOCAL_SERIAL: Estos niveles se utilizan en combinación con operaciones de lectura y escritura de tipo "lightweight transactions" (LWT), que proporcionan un mecanismo para garantizar la consistencia a través de operaciones de tipo transacción.
-
-La elección del nivel de consistencia depende de los requisitos específicos de la aplicación, considerando factores como la consistencia deseada, la latencia tolerada y la disponibilidad. Es importante comprender las implicaciones de rendimiento y latencia al seleccionar un nivel de consistencia particular, ya que niveles más altos de consistencia pueden resultar en una menor disponibilidad y mayores tiempos de respuesta.
+The choice of consistency level depends on the specific requirements of the application, considering factors such as desired consistency, tolerated latency, and availability. It is important to understand the performance and latency implications when selecting a particular consistency level, as higher consistency levels may result in lower availability and longer response times.
