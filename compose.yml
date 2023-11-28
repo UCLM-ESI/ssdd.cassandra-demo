@@ -1,0 +1,25 @@
+version: '3.4'
+
+x-common-variables: &common-variables
+  CASSANDRA_CLUSTER_NAME: DemoCluster
+  CASSANDRA_SEEDS: cassandra-node1
+  # CASSANDRA_AUTO_BOOTSTRAP: false
+  # CASSANDRA_DC: datacenter1
+  # CASSANDRA_RACK: rack1
+  # CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+
+services:
+  cassandra-node1:
+    image: cassandra:latest
+    container_name: cassandra-node1
+    environment: *common-variables
+
+  cassandra-node2:
+    image: cassandra:latest
+    container_name: cassandra-node2
+    environment: *common-variables
+
+  cassandra-node3:
+    image: cassandra:latest
+    container_name: cassandra-node3
+    environment: *common-variables
