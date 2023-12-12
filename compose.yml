@@ -1,7 +1,7 @@
 version: '3.4'
 
 x-common-variables: &common-variables
-  CASSANDRA_CLUSTER_NAME: DemoCluster
+  CASSANDRA_CLUSTER_NAME: demo
   CASSANDRA_SEEDS: cassandra-node1
   # CASSANDRA_AUTO_BOOTSTRAP: false
   # CASSANDRA_DC: datacenter1
