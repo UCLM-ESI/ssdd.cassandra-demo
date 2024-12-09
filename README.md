@@ -15,7 +15,6 @@ CREATE KEYSPACE demo_keyspace WITH replication = {'class': 'SimpleStrategy', 're
 ```
 
 This command creates a keyspace named "DemoKeyspace" with a simple replication strategy and a replication factor of 3. This means that the data will be replicated to three nodes.
-nodes.
 
 ### Creates a table in the keyspace
 
@@ -46,14 +45,14 @@ By setting consistency in QUORUM, we are ensuring that at least most of the node
 Stop a Cassandra node by:
 
 ```bash
-$ docker compose stop <node>
+$ docker compose stop node2
 ```
 
 
 ### Reactivation of the stopped node
 
 ```bash
-$ nodetool resumehandoff <node_id>
+node2$ nodetool resumehandoff
 ```
 
 You can monitor the synchronization process using ``nodetool`:

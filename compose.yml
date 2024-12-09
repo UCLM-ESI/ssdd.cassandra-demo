@@ -1,5 +1,3 @@
-version: '3.4'
-
 x-common-variables: &common-variables
   CASSANDRA_CLUSTER_NAME: demo
   CASSANDRA_SEEDS: cassandra-node1
